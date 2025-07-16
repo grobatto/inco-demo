@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INCO Soluciones - Demo Chatbot IA</title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+    <!-- Favicon SVG para compatibilidad moderna -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
     
     <style>
         * {
@@ -18,6 +18,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             overflow-x: hidden;
+            background: #f8f9fa;
         }
 
         /* Header */
@@ -25,10 +26,11 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         nav {
@@ -41,7 +43,7 @@
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #004B87;
         }
@@ -66,7 +68,7 @@
         /* Hero Section */
         .hero {
             height: 100vh;
-            background: linear-gradient(135deg, #6B46C1 0%, #E91E63 100%);
+            background: linear-gradient(135deg, #004B87 0%, #3a7bd5 100%);
             position: relative;
             display: flex;
             align-items: center;
@@ -74,14 +76,13 @@
             overflow: hidden;
         }
 
-        /* Network Animation Background */
         .network-bg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.3;
+            opacity: 0.2;
         }
 
         .hero-content {
@@ -110,7 +111,7 @@
             display: inline-block;
             padding: 1rem 2.5rem;
             background: white;
-            color: #6B46C1;
+            color: #004B87;
             text-decoration: none;
             border-radius: 50px;
             font-weight: bold;
@@ -121,7 +122,7 @@
         }
 
         .cta-button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: 0 6px 30px rgba(0,0,0,0.3);
         }
 
@@ -140,37 +141,46 @@
         .features h2 {
             font-size: 2.5rem;
             color: #333;
+            margin-bottom: 1.5rem;
+        }
+        
+        .features .subtitle {
+            font-size: 1.2rem;
+            color: #666;
             margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin-top: 3rem;
         }
 
         .feature-card {
             background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
         .feature-icon {
             font-size: 3rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .feature-card h3 {
             color: #004B87;
             margin-bottom: 1rem;
+            font-size: 1.5rem;
         }
 
         /* Chat Demo Section */
@@ -194,7 +204,7 @@
 
         .demo-arrow {
             font-size: 3rem;
-            color: #E91E63;
+            color: #004B87;
             animation: bounce 2s infinite;
             margin-top: 2rem;
         }
@@ -209,41 +219,21 @@
 
         /* Animations */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-20px);
-            }
-            60% {
-                transform: translateY(-10px);
-            }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1.2rem;
-            }
-            
-            .nav-links {
-                display: none;
-            }
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.2rem; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
@@ -263,7 +253,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="inicio">
         <canvas class="network-bg" id="networkCanvas"></canvas>
         <div class="hero-content">
             <h1>Soluciones que transforman</h1>
@@ -273,16 +263,16 @@
     </section>
 
     <!-- Features -->
-    <section class="features">
+    <section class="features" id="soluciones">
         <div class="features-container">
             <h2>Nuestro Asistente Virtual con IA</h2>
-            <p>Disponible 24/7 para ayudarte a encontrar la mejor solución tecnológica para tu empresa</p>
+            <p class="subtitle">Disponible 24/7 para ayudarte a encontrar la mejor solución tecnológica para tu empresa</p>
             
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">🤖</div>
                     <h3>Inteligencia Artificial</h3>
-                    <p>Powered by Claude 3.5 Sonnet, comprende tus necesidades y te asesora de forma personalizada</p>
+                    <p>Powered by Gemini Flash 2.5, comprende tus necesidades y te asesora de forma personalizada</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
@@ -312,7 +302,6 @@
 
     <!-- Network Animation Script -->
     <script>
-        // Network background animation
         const canvas = document.getElementById('networkCanvas');
         const ctx = canvas.getContext('2d');
         
@@ -320,15 +309,15 @@
         canvas.height = window.innerHeight;
         
         const particles = [];
-        const particleCount = 100;
+        const particleCount = Math.min(100, window.innerWidth / 15);
         
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.radius = Math.random() * 2 + 1;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.radius = Math.random() * 1.5 + 1;
             }
             
             update() {
@@ -347,7 +336,6 @@
             }
         }
         
-        // Create particles
         for (let i = 0; i < particleCount; i++) {
             particles.push(new Particle());
         }
@@ -355,24 +343,22 @@
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Update and draw particles
             particles.forEach(particle => {
                 particle.update();
                 particle.draw();
             });
             
-            // Draw connections
             particles.forEach((p1, i) => {
                 particles.slice(i + 1).forEach(p2 => {
                     const dx = p1.x - p2.x;
                     const dy = p1.y - p2.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     
-                    if (distance < 100) {
+                    if (distance < 120) {
                         ctx.beginPath();
                         ctx.moveTo(p1.x, p1.y);
                         ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 100)})`;
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 120)})`;
                         ctx.stroke();
                     }
                 });
@@ -383,236 +369,130 @@
         
         animate();
         
-        // Resize handler
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
     </script>
 
-    <!-- WIDGET CHAT INCO -->
+    <!-- WIDGET CHAT INCO - VERSIÓN ROBUSTA -->
     <script>
     (function() {
         'use strict';
         
-        console.log('[INCO Widget] Iniciando carga...');
-        
-        // Configuración
+        // --- Configuración ---
         const CHAT_API_URL = 'https://uz24oxgmic.execute-api.us-east-1.amazonaws.com/dev/chat';
         const PRIMARY_COLOR = '#004B87';
-        
-        // Estilos
+
+        // --- Inyectar Estilos del Widget ---
         const styles = document.createElement('style');
         styles.textContent = `
             #inco-chat-button {
-                position: fixed !important;
-                bottom: 20px !important;
-                right: 20px !important;
-                width: 60px !important;
-                height: 60px !important;
-                background: ${PRIMARY_COLOR} !important;
-                border-radius: 50% !important;
-                cursor: pointer !important;
-                box-shadow: 0 4px 12px rgba(0,75,135,0.3) !important;
-                z-index: 99999 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border: none !important;
-                color: white !important;
-                font-size: 28px !important;
+                position: fixed !important; bottom: 20px !important; right: 20px !important;
+                width: 60px !important; height: 60px !important; background: ${PRIMARY_COLOR} !important;
+                border-radius: 50% !important; cursor: pointer !important;
+                box-shadow: 0 4px 12px rgba(0,75,135,0.3) !important; z-index: 99999 !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                border: none !important; color: white !important; font-size: 28px !important;
                 transition: all 0.3s ease !important;
             }
-            
             #inco-chat-button:hover {
                 transform: scale(1.1) !important;
                 box-shadow: 0 6px 20px rgba(0,75,135,0.4) !important;
             }
-            
             #inco-chat-window {
-                position: fixed !important;
-                bottom: 90px !important;
-                right: 20px !important;
-                width: 380px !important;
-                max-width: 90vw !important;
-                height: 600px !important;
-                max-height: 80vh !important;
-                background: white !important;
-                border-radius: 16px !important;
-                box-shadow: 0 5px 40px rgba(0,0,0,0.2) !important;
-                z-index: 99998 !important;
-                display: none !important;
-                flex-direction: column !important;
+                position: fixed !important; bottom: 90px !important; right: 20px !important;
+                width: 380px !important; max-width: 90vw !important; height: 600px !important;
+                max-height: 80vh !important; background: white !important; border-radius: 16px !important;
+                box-shadow: 0 5px 40px rgba(0,0,0,0.2) !important; z-index: 99998 !important;
+                display: none; flex-direction: column !important;
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif !important;
                 overflow: hidden !important;
             }
-            
-            #inco-chat-window.show {
-                display: flex !important;
-            }
-            
+            #inco-chat-window.show { display: flex !important; }
             #inco-chat-header {
                 background: linear-gradient(135deg, ${PRIMARY_COLOR} 0%, #0066b3 100%) !important;
-                color: white !important;
-                padding: 20px !important;
-                font-weight: 600 !important;
-                font-size: 16px !important;
-                text-align: center !important;
+                color: white !important; padding: 20px !important; font-weight: 600 !important;
+                font-size: 16px !important; text-align: center !important;
                 box-shadow: 0 2px 10px rgba(0,75,135,0.2) !important;
             }
-            
             #inco-chat-messages {
-                flex: 1 !important;
-                overflow-y: auto !important;
-                padding: 20px !important;
+                flex: 1 !important; overflow-y: auto !important; padding: 20px !important;
                 background: #f8f9fa !important;
             }
-            
-            #inco-chat-messages::-webkit-scrollbar {
-                width: 6px !important;
-            }
-            
-            #inco-chat-messages::-webkit-scrollbar-thumb {
-                background: #ddd !important;
-                border-radius: 3px !important;
-            }
-            
             .inco-message {
-                margin-bottom: 15px !important;
-                display: flex !important;
-                animation: fadeIn 0.3s ease !important;
+                margin-bottom: 15px !important; display: flex !important;
+                animation: inco-fadeIn 0.3s ease !important;
             }
-            
-            @keyframes fadeIn {
+            @keyframes inco-fadeIn {
                 from { opacity: 0; transform: translateY(10px); }
                 to { opacity: 1; transform: translateY(0); }
             }
-            
-            .inco-message.user {
-                justify-content: flex-end !important;
-            }
-            
+            .inco-message.user { justify-content: flex-end !important; }
             .inco-message-content {
-                max-width: 70% !important;
-                padding: 12px 16px !important;
-                border-radius: 18px !important;
-                font-size: 14px !important;
-                line-height: 1.4 !important;
-                word-wrap: break-word !important;
-            }
-            
-            .inco-message.bot .inco-message-content {
-                background: white !important;
+                max-width: 75% !important; padding: 12px 16px !important; border-radius: 18px !important;
+                font-size: 14px !important; line-height: 1.4 !important; word-wrap: break-word !important;
                 color: #333 !important;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-                border-bottom-left-radius: 4px !important;
             }
-            
+            .inco-message.bot .inco-message-content {
+                background: #E9E9EB !important; border-bottom-left-radius: 4px !important;
+            }
             .inco-message.user .inco-message-content {
-                background: ${PRIMARY_COLOR} !important;
-                color: white !important;
+                background: ${PRIMARY_COLOR} !important; color: white !important;
                 border-bottom-right-radius: 4px !important;
             }
-            
             #inco-chat-input-container {
-                padding: 15px !important;
-                border-top: 1px solid #e9ecef !important;
-                background: white !important;
-                display: flex !important;
-                gap: 10px !important;
+                padding: 15px !important; border-top: 1px solid #e9ecef !important;
+                background: white !important; display: flex !important; gap: 10px !important;
             }
-            
             #inco-chat-input {
-                flex: 1 !important;
-                padding: 12px 16px !important;
-                border: 1px solid #e0e0e0 !important;
-                border-radius: 24px !important;
-                outline: none !important;
-                font-size: 14px !important;
-                font-family: inherit !important;
+                flex: 1 !important; padding: 12px 16px !important;
+                border: 1px solid #e0e0e0 !important; border-radius: 24px !important;
+                outline: none !important; font-size: 14px !important; font-family: inherit !important;
                 transition: all 0.3s ease !important;
             }
-            
             #inco-chat-input:focus {
                 border-color: ${PRIMARY_COLOR} !important;
                 box-shadow: 0 0 0 2px rgba(0,75,135,0.1) !important;
             }
-            
             #inco-send-button {
-                width: 40px !important;
-                height: 40px !important;
-                border-radius: 50% !important;
-                background: ${PRIMARY_COLOR} !important;
-                border: none !important;
-                cursor: pointer !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                color: white !important;
-                font-size: 20px !important;
+                width: 40px !important; height: 40px !important; border-radius: 50% !important;
+                background: ${PRIMARY_COLOR} !important; border: none !important; cursor: pointer !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
                 transition: all 0.3s ease !important;
             }
-            
             #inco-send-button:hover:not(:disabled) {
-                background: #003660 !important;
-                transform: scale(1.05) !important;
+                background: #003660 !important; transform: scale(1.05) !important;
             }
-            
             #inco-send-button:disabled {
-                background: #ccc !important;
-                cursor: not-allowed !important;
+                background: #ccc !important; cursor: not-allowed !important;
             }
-            
             .inco-typing {
-                display: inline-flex !important;
-                align-items: center !important;
-                padding: 12px 16px !important;
-                background: white !important;
-                border-radius: 18px !important;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+                display: inline-flex !important; align-items: center !important;
+                padding: 12px 16px !important; background: #E9E9EB !important;
+                border-radius: 18px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
             }
-            
             .inco-typing span {
-                display: inline-block !important;
-                width: 8px !important;
-                height: 8px !important;
-                border-radius: 50% !important;
-                background: #999 !important;
-                margin: 0 2px !important;
-                animation: typing-bounce 1.4s infinite !important;
+                display: inline-block !important; width: 8px !important; height: 8px !important;
+                border-radius: 50% !important; background: #999 !important; margin: 0 2px !important;
+                animation: inco-typing-bounce 1.4s infinite !important;
             }
-            
-            .inco-typing span:nth-child(1) { animation-delay: 0s !important; }
             .inco-typing span:nth-child(2) { animation-delay: 0.2s !important; }
             .inco-typing span:nth-child(3) { animation-delay: 0.4s !important; }
-            
-            @keyframes typing-bounce {
-                0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
-                30% { transform: translateY(-10px); opacity: 1; }
+            @keyframes inco-typing-bounce {
+                0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); }
             }
-            
             @media (max-width: 480px) {
                 #inco-chat-window {
-                    width: 100% !important;
-                    height: 100% !important;
-                    bottom: 0 !important;
-                    right: 0 !important;
-                    left: 0 !important;
-                    top: 0 !important;
-                    border-radius: 0 !important;
-                    max-width: 100% !important;
-                    max-height: 100% !important;
-                }
-                
-                #inco-chat-button {
-                    bottom: 10px !important;
-                    right: 10px !important;
+                    width: 100% !important; height: 100% !important; bottom: 0 !important;
+                    right: 0 !important; top: 0 !important; left: 0 !important;
+                    border-radius: 0 !important; max-height: 100% !important;
                 }
             }
         `;
         document.head.appendChild(styles);
         
-        // Crear elementos HTML
+        // --- Crear Elementos del Widget ---
         const chatButton = document.createElement('button');
         chatButton.id = 'inco-chat-button';
         chatButton.innerHTML = '💬';
@@ -621,17 +501,10 @@
         const chatWindow = document.createElement('div');
         chatWindow.id = 'inco-chat-window';
         chatWindow.innerHTML = `
-            <div id="inco-chat-header">
-                💬 INCO Soluciones - Asistente Virtual
-            </div>
+            <div id="inco-chat-header">💬 INCO Soluciones - Asistente Virtual</div>
             <div id="inco-chat-messages"></div>
             <div id="inco-chat-input-container">
-                <input 
-                    type="text" 
-                    id="inco-chat-input" 
-                    placeholder="Escribe tu mensaje..."
-                    maxlength="500"
-                />
+                <input type="text" id="inco-chat-input" placeholder="Escribe tu mensaje..." maxlength="500" />
                 <button id="inco-send-button" aria-label="Enviar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
@@ -643,66 +516,49 @@
         document.body.appendChild(chatButton);
         document.body.appendChild(chatWindow);
         
-        // Variables
+        // --- Lógica del Widget ---
         const messagesContainer = document.getElementById('inco-chat-messages');
         const chatInput = document.getElementById('inco-chat-input');
         const sendButton = document.getElementById('inco-send-button');
         
         let isOpen = false;
         let isTyping = false;
-        let messageCount = 0;
-        let sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        let sessionId = localStorage.getItem('inco-session-id') || 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('inco-session-id', sessionId);
         
-        // Funciones
         function toggleChat() {
             isOpen = !isOpen;
-            
+            chatWindow.classList.toggle('show');
+            chatButton.innerHTML = isOpen ? '✖️' : '💬';
             if (isOpen) {
-                chatWindow.classList.add('show');
-                chatButton.innerHTML = '✖';
-                
-                if (messagesContainer.children.length === 0) {
-                    setTimeout(() => {
-                        addMessage('bot', '¡Hola! 👋 Soy el asistente virtual de INCO Soluciones. ¿En qué puedo ayudarte hoy?');
-                    }, 300);
-                }
-                
                 chatInput.focus();
-            } else {
-                chatWindow.classList.remove('show');
-                chatButton.innerHTML = '💬';
+                if (messagesContainer.children.length === 0) {
+                    setTimeout(() => addMessage('bot', '¡Hola! 👋 Soy el asistente virtual de INCO Soluciones. ¿En qué puedo ayudarte hoy?'), 300);
+                }
             }
         }
         
         function addMessage(sender, text) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `inco-message ${sender}`;
-            
             const contentDiv = document.createElement('div');
             contentDiv.className = 'inco-message-content';
             contentDiv.textContent = text;
-            
             messageDiv.appendChild(contentDiv);
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-        
-        function showTyping() {
+
+        function showTypingIndicator() {
             const typingDiv = document.createElement('div');
             typingDiv.className = 'inco-message bot';
             typingDiv.id = 'inco-typing-indicator';
-            typingDiv.innerHTML = `
-                <div class="inco-typing">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            `;
+            typingDiv.innerHTML = `<div class="inco-typing"><span></span><span></span><span></span></div>`;
             messagesContainer.appendChild(typingDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-        
-        function hideTyping() {
+
+        function hideTypingIndicator() {
             const indicator = document.getElementById('inco-typing-indicator');
             if (indicator) indicator.remove();
         }
@@ -711,54 +567,38 @@
             const message = chatInput.value.trim();
             if (!message || isTyping) return;
             
-            if (messageCount >= 20) {
-                addMessage('bot', '⚠️ Hemos alcanzado el límite de esta conversación. Por favor, comparte tu email o teléfono para que nuestro equipo pueda continuar asistiéndote.');
-                chatInput.disabled = true;
-                sendButton.disabled = true;
-                return;
-            }
-            
-            messageCount++;
-            isTyping = true;
-            
             addMessage('user', message);
             chatInput.value = '';
+            isTyping = true;
             chatInput.disabled = true;
             sendButton.disabled = true;
-            
-            showTyping();
+            showTypingIndicator();
             
             try {
                 const response = await fetch(CHAT_API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        sessionId: sessionId
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, sessionId })
                 });
-                
+
                 if (!response.ok) {
-                    throw new Error('Error del servidor');
+                    const errorData = await response.json().catch(() => ({ error: `Error HTTP: ${response.status}` }));
+                    throw new Error(errorData.error || `Error HTTP: ${response.status}`);
                 }
                 
                 const data = await response.json();
                 
-                hideTyping();
+                hideTypingIndicator();
                 addMessage('bot', data.response || 'Lo siento, no pude procesar tu mensaje.');
                 
                 if (data.leadCaptured) {
-                    setTimeout(() => {
-                        addMessage('bot', '✅ He registrado tu información. Nuestro equipo se pondrá en contacto contigo pronto.');
-                    }, 1000);
+                    setTimeout(() => addMessage('bot', '✅ ¡Perfecto! He registrado tu información. Un especialista se pondrá en contacto contigo pronto.'), 1000);
                 }
                 
             } catch (error) {
                 console.error('[INCO Widget] Error:', error);
-                hideTyping();
-                addMessage('bot', '😔 Disculpa, tuve un problema de conexión. ¿Puedes intentar de nuevo?');
+                hideTypingIndicator();
+                addMessage('bot', `😔 Disculpa, ocurrió un error. Por favor, intenta de nuevo. (Detalle: ${error.message})`);
             } finally {
                 isTyping = false;
                 chatInput.disabled = false;
@@ -767,19 +607,16 @@
             }
         }
         
-        // Event listeners
+        // --- Event Listeners ---
         chatButton.addEventListener('click', toggleChat);
-        
-        chatInput.addEventListener('keypress', function(e) {
+        sendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
         });
         
-        sendButton.addEventListener('click', sendMessage);
-        
-        console.log('[INCO Widget] ✅ Cargado exitosamente');
     })();
     </script>
 </body>
