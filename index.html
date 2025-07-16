@@ -272,7 +272,7 @@
                 <div class="feature-card">
                     <div class="feature-icon">🤖</div>
                     <h3>Inteligencia Artificial</h3>
-                    <p>Powered by Gemini Flash 2.5, comprende tus necesidades y te asesora de forma personalizada</p>
+                    <p>Powered by Gemini Flash, comprende tus necesidades y te asesora de forma personalizada</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
@@ -375,16 +375,14 @@
         });
     </script>
 
-    <!-- WIDGET CHAT INCO - VERSIÓN ROBUSTA -->
+    <!-- WIDGET CHAT INCO - VERSIÓN CORREGIDA -->
     <script>
     (function() {
         'use strict';
         
-        // --- Configuración ---
         const CHAT_API_URL = 'https://uz24oxgmic.execute-api.us-east-1.amazonaws.com/dev/chat';
         const PRIMARY_COLOR = '#004B87';
 
-        // --- Inyectar Estilos del Widget ---
         const styles = document.createElement('style');
         styles.textContent = `
             #inco-chat-button {
@@ -492,7 +490,6 @@
         `;
         document.head.appendChild(styles);
         
-        // --- Crear Elementos del Widget ---
         const chatButton = document.createElement('button');
         chatButton.id = 'inco-chat-button';
         chatButton.innerHTML = '💬';
@@ -516,7 +513,6 @@
         document.body.appendChild(chatButton);
         document.body.appendChild(chatWindow);
         
-        // --- Lógica del Widget ---
         const messagesContainer = document.getElementById('inco-chat-messages');
         const chatInput = document.getElementById('inco-chat-input');
         const sendButton = document.getElementById('inco-send-button');
@@ -591,9 +587,9 @@
                 hideTypingIndicator();
                 addMessage('bot', data.response || 'Lo siento, no pude procesar tu mensaje.');
                 
-                if (data.leadCaptured) {
-                    setTimeout(() => addMessage('bot', '✅ ¡Perfecto! He registrado tu información. Un especialista se pondrá en contacto contigo pronto.'), 1000);
-                }
+                // --- CAMBIO IMPORTANTE: Mensaje de confirmación ELIMINADO ---
+                // La IA ahora es responsable de dar el mensaje de cierre cuando corresponda.
+                // El bloque if(data.leadCaptured) { ... } ha sido eliminado.
                 
             } catch (error) {
                 console.error('[INCO Widget] Error:', error);
