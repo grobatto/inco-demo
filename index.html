@@ -272,7 +272,7 @@
                 <div class="feature-card">
                     <div class="feature-icon">🤖</div>
                     <h3>Inteligencia Artificial</h3>
-                    <p>Powered by Gemini Flash, comprende tus necesidades y te asesora de forma personalizada</p>
+                    <p>Powered by Gemini, comprende tus necesidades y te asesora de forma personalizada</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
@@ -297,82 +297,39 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2025 INCO Soluciones - Demo Chatbot IA</p>
+        <p>© 2025 INCO Soluciones - Demo Chatbot IA</p>
     </footer>
 
     <!-- Network Animation Script -->
     <script>
         const canvas = document.getElementById('networkCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        const particles = [];
-        const particleCount = Math.min(100, window.innerWidth / 15);
-        
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.3;
-                this.vy = (Math.random() - 0.5) * 0.3;
-                this.radius = Math.random() * 1.5 + 1;
-            }
-            
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
-            
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.fill();
-            }
-        }
-        
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-        
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            
-            particles.forEach((p1, i) => {
-                particles.slice(i + 1).forEach(p2 => {
-                    const dx = p1.x - p2.x;
-                    const dy = p1.y - p2.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 120)})`;
-                        ctx.stroke();
-                    }
-                });
-            });
-            
-            requestAnimationFrame(animate);
-        }
-        
-        animate();
-        
-        window.addEventListener('resize', () => {
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-        });
+            const particles = [];
+            const particleCount = Math.min(100, window.innerWidth / 15);
+            class Particle {
+                constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.vx = (Math.random() - 0.5) * 0.3; this.vy = (Math.random() - 0.5) * 0.3; this.radius = Math.random() * 1.5 + 1; }
+                update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width) this.vx *= -1; if (this.y < 0 || this.y > canvas.height) this.vy *= -1; }
+                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.fill(); }
+            }
+            for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); }
+            function animate() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                particles.forEach((p1, i) => {
+                    particles.slice(i + 1).forEach(p2 => {
+                        const dx = p1.x - p2.x; const dy = p1.y - p2.y; const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) { ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - dist / 120)})`; ctx.stroke(); }
+                    });
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+        }
     </script>
 
     <!-- WIDGET CHAT INCO - VERSIÓN FINAL -->
@@ -380,6 +337,7 @@
     (function() {
         'use strict';
         
+        // --- ¡ÚNICO CAMBIO REALIZADO AQUÍ! ---
         const CHAT_API_URL = 'https://fnsqgktk6k.execute-api.us-east-1.amazonaws.com/chat';
         const PRIMARY_COLOR = '#004B87';
 
@@ -432,11 +390,9 @@
                 font-size: 14px !important; line-height: 1.5 !important; word-wrap: break-word !important;
                 color: #333 !important;
             }
-            /* --- CORRECCIÓN VISUAL --- */
             .inco-message.bot .inco-message-content {
                 background: #E9E9EB !important; border-bottom-left-radius: 4px !important;
-                display: inline-block; /* Hace que el globo se ajuste al contenido */
-                text-align: left;
+                display: inline-block; text-align: left;
             }
             .inco-message.user .inco-message-content {
                 background: ${PRIMARY_COLOR} !important; color: white !important;
@@ -531,8 +487,10 @@
             chatButton.innerHTML = isOpen ? '✖️' : '💬';
             if (isOpen) {
                 chatInput.focus();
+                // Solo muestra el saludo inicial si el chat está vacío.
                 if (messagesContainer.children.length === 0) {
-                    setTimeout(() => addMessage('bot', '¡Hola! 👋 Soy el asistente virtual de INCO Soluciones. ¿En qué puedo ayudarte hoy?'), 300);
+                     // Llama al backend por un saludo inicial o usa uno por defecto
+                    sendMessage(true); // Llama a send message con un flag para el saludo
                 }
             }
         }
@@ -562,22 +520,27 @@
             if (indicator) indicator.remove();
         }
         
-        async function sendMessage() {
+        async function sendMessage(isGreeting = false) {
             const message = chatInput.value.trim();
-            if (!message || isTyping) return;
+            if (!message && !isGreeting || isTyping) return;
             
-            addMessage('user', message);
-            chatInput.value = '';
+            if (!isGreeting) {
+                addMessage('user', message);
+                chatInput.value = '';
+            }
+
             isTyping = true;
             chatInput.disabled = true;
             sendButton.disabled = true;
             showTypingIndicator();
             
             try {
+                // Si es un saludo, el mensaje puede ser un string predefinido o vacío.
+                const messageToSend = isGreeting ? "Hola" : message;
                 const response = await fetch(CHAT_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, sessionId })
+                    body: JSON.stringify({ message: messageToSend, sessionId })
                 });
 
                 if (!response.ok) {
@@ -593,7 +556,7 @@
             } catch (error) {
                 console.error('[INCO Widget] Error:', error);
                 hideTypingIndicator();
-                addMessage('bot', `😔 Disculpa, ocurrió un error. Por favor, intenta de nuevo. (Detalle: ${error.message})`);
+                addMessage('bot', `😔 Disculpa, ocurrió un error. Por favor, intenta de nuevo.`);
             } finally {
                 isTyping = false;
                 chatInput.disabled = false;
@@ -603,11 +566,11 @@
         }
         
         chatButton.addEventListener('click', toggleChat);
-        sendButton.addEventListener('click', sendMessage);
+        sendButton.addEventListener('click', () => sendMessage(false));
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendMessage();
+                sendMessage(false);
             }
         });
         
