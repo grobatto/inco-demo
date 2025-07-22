@@ -73,8 +73,10 @@
                             J[Monday.com API]
                         end
 
-                        A -- "POST /chat" --> B; A -- "GET /leads" --> B
-                        B -- "Invoca función chat" --> C; B -- "Invoca función getLeads" --> D
+                        A -- "POST /chat" --> B
+                        A -- "GET /leads" --> B
+                        B -- "Invoca función chat" --> C
+                        B -- "Invoca función getLeads" --> D
                         C -- "Guarda/Lee Historial" --> E
                         C -- "Obtiene Credenciales" --> G
                         C -- "Genera Respuesta IA" --> I
@@ -110,7 +112,6 @@
     (function() {
         'use strict';
         
-        // ✅ CORRECCIÓN: Se actualiza la URL de la API a la última versión desplegada.
         const CHAT_API_URL = 'https://nwzz035rv2.execute-api.us-east-1.amazonaws.com/chat';
         const PRIMARY_COLOR = '#004B87';
 
@@ -345,7 +346,7 @@
     </script>
     
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.js';
         mermaid.initialize({ startOnLoad: true });
     </script>
 </body>
