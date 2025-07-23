@@ -465,6 +465,13 @@
             align-items: center;
         }
 
+        /* --- NUEVO ESTILO PARA EL CONTENEDOR DE BOTONES DEL HEADER --- */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .modal-messages {
             flex: 1;
             overflow-y: auto;
@@ -518,13 +525,13 @@
             transform: scale(1.05);
         }
 
-        .close-button {
+        .header-button { /* --- NUEVO ESTILO PARA BOTONES DEL HEADER --- */
             background: none;
             border: none;
             color: var(--text-secondary);
             font-size: 1.5rem;
             cursor: pointer;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
             padding: 0;
             width: 40px;
             height: 40px;
@@ -534,7 +541,7 @@
             border-radius: 50%;
         }
 
-        .close-button:hover {
+        .header-button:hover {
             color: white;
             background: rgba(255, 255, 255, 0.1);
         }
@@ -602,6 +609,7 @@
             width: 24px;
             height: 24px;
             fill: currentColor;
+            stroke: currentColor;
         }
 
         .icon-large {
@@ -638,7 +646,7 @@
             </p>
             <button class="cta-button" onclick="openModal()">
                 Ver Demo en Vivo
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
                     <path d="M9 5l7 7-7 7"/>
                 </svg>
             </button>
@@ -856,7 +864,15 @@
                         <p style="font-size: 0.875rem; color: #22c55e; margin: 0;">En línea</p>
                     </div>
                 </div>
-                <button class="close-button" onclick="closeModal()">×</button>
+                <!-- ✅ CAMBIO: Contenedor para los botones del header -->
+                <div class="header-buttons">
+                    <button id="restartButton" class="header-button" title="Reiniciar Conversación">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L20.5 10a5 5 0 0 0-7.85 4.36"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L3.5 14a5 5 0 0 0 7.85-4.36"/>
+                        </svg>
+                    </button>
+                    <button class="header-button" onclick="closeModal()">×</button>
+                </div>
             </div>
             <div id="messagesContainer" class="modal-messages">
                 <!-- Messages will be injected here -->
@@ -878,16 +894,19 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const messagesContainer = document.getElementById('messagesContainer');
+        const restartButton = document.getElementById('restartButton'); // ✅ CAMBIO: Referencia al nuevo botón
         
-        const API_URL = 'https://nwzz035rv2.execute-api.us-east-1.amazonaws.com/chat'; // <-- URL de tu API
+        const API_URL = 'https://fnsqgktk6k.execute-api.us-east-1.amazonaws.com/chat'; // <-- URL de tu API
         let isLoading = false;
-        
-        // --- ✅ CORRECCIÓN: Generación y persistencia del Session ID ---
         let sessionId = localStorage.getItem('inco-agent-sessionId');
-        if (!sessionId) {
-            sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('inco-agent-sessionId', sessionId);
+
+        function initializeSession() {
+            if (!sessionId) {
+                sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('inco-agent-sessionId', sessionId);
+            }
         }
+        initializeSession();
 
         function openModal() {
             chatModal.classList.add('active');
@@ -899,6 +918,20 @@
 
         function closeModal() {
             chatModal.classList.remove('active');
+        }
+
+        // --- ✅ CAMBIO: Nueva función para reiniciar la sesión ---
+        function restartSession() {
+            // Borrar el ID de sesión anterior
+            localStorage.removeItem('inco-agent-sessionId');
+            sessionId = null;
+            // Inicializar una nueva sesión
+            initializeSession();
+            // Limpiar los mensajes de la ventana
+            messagesContainer.innerHTML = '';
+            // Añadir el mensaje de bienvenida
+            addMessage('¡Hola! Soy el asistente de INCO Soluciones. Es un gusto saludarte. ¿Cómo puedo ayudarte hoy?', false);
+            messageInput.focus();
         }
 
         function handleKeyPress(event) {
@@ -961,7 +994,6 @@
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // --- ✅ CORRECCIÓN: Se añade el sessionId al cuerpo de la petición ---
                     body: JSON.stringify({ 
                         message: message,
                         sessionId: sessionId 
@@ -992,6 +1024,9 @@
                 closeModal();
             }
         });
+        
+        // --- ✅ CAMBIO: Event listener para el nuevo botón ---
+        restartButton.addEventListener('click', restartSession);
     </script>
 </body>
 </html>
