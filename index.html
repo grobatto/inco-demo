@@ -930,18 +930,6 @@
             <div id="messagesContainer" class="modal-messages reveal" role="log" aria-live="polite" aria-relevant="additions">
                 <!-- Messages will be injected here -->
             </div>
-            <!-- Calendly overlay inside modal -->
-            <div id="calendlyContainer" class="calendly-container" aria-hidden="true">
-                <div class="calendly-panel" role="dialog" aria-modal="true" aria-labelledby="calendlyTitle">
-                    <div class="calendly-header">
-                        <span id="calendlyTitle" class="panel-title">Agendar una reunión</span>
-                        <button class="panel-close" onclick="closeCalendly()" aria-label="Volver al chat">Volver al chat</button>
-                    </div>
-                    <div class="calendly-body">
-                        <div id="calendlyInline" class="calendly-inline-widget" style="min-width:320px;height:100%;"></div>
-                    </div>
-                </div>
-            </div>
             <div class="modal-input">
                 <input type="text" id="messageInput" placeholder="Escribe tu mensaje..." onkeypress="handleKeyPress(event)">
                 <button id="sendButton" onclick="sendMessage()">
@@ -960,8 +948,6 @@
         const sendButton = document.getElementById('sendButton');
         const messagesContainer = document.getElementById('messagesContainer');
         const resetBtn = document.getElementById('resetButton');
-        const calendlyContainer = document.getElementById('calendlyContainer');
-        const calendlyInline = document.getElementById('calendlyInline');
         
         const API_URL = 'https://nwzz035rv2.execute-api.us-east-1.amazonaws.com/chat'; // <-- URL de tu API
         let isLoading = false;
@@ -1031,15 +1017,18 @@
             const text = document.createElement('div');
             text.textContent = 'Para coordinar la próxima charla, podés reservar una reunión cuando te quede cómodo:';
 
-            const btn = document.createElement('button');
-            btn.className = 'schedule-btn';
-            btn.textContent = 'Agendar demo';
-            btn.onclick = () => openCalendly(url);
-            btn.setAttribute('aria-label', 'Abrir calendario para agendar demo');
+            const link = document.createElement('a');
+            link.className = 'schedule-btn';
+            link.textContent = 'Agendar demo';
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.setAttribute('role', 'button');
+            link.setAttribute('aria-label', 'Abrir Calendly en una nueva pestaña');
 
             bubble.appendChild(text);
             bubble.appendChild(document.createElement('br'));
-            bubble.appendChild(btn);
+            bubble.appendChild(link);
 
             wrap.appendChild(avatar);
             wrap.appendChild(bubble);
@@ -1104,10 +1093,10 @@
                 hideTypingIndicator();
 
                 const botText = data.response || 'Lo siento, hubo un error al procesar tu mensaje.';
-                // Detectar enlace de Calendly en el texto para renderizar botón/embebido
+                // Detectar enlace de Calendly en el texto para renderizar botón con link directo
                 const calendlyMatch = botText.match(/https?:\/\/calendly\.com\/[^\s)]+/i);
                 if (calendlyMatch) {
-                    // Añadir el texto sin el link como mensaje y luego el botón
+                    // Añadir el texto sin el link como mensaje y luego el botón que abre en nueva pestaña
                     const textWithoutLink = botText.replace(calendlyMatch[0], '').trim();
                     if (textWithoutLink) addMessage(textWithoutLink, false);
                     addScheduleMessage(calendlyMatch[0]);
@@ -1124,28 +1113,7 @@
             }
         }
 
-        // Abre Calendly dentro del modal
-        function openCalendly(url) {
-            calendlyInline.setAttribute('data-url', url);
-            calendlyContainer.style.display = 'flex';
-            calendlyContainer.setAttribute('aria-hidden', 'false');
-            if (window.Calendly && window.Calendly.initInlineWidgets) {
-                window.Calendly.initInlineWidgets();
-            }
-        }
-
-        function closeCalendly() {
-            calendlyContainer.style.display = 'none';
-            calendlyContainer.setAttribute('aria-hidden', 'true');
-        }
-
-        // Escuchar evento de Calendly cuando se agenda
-        window.addEventListener('message', function(e) {
-            if (typeof e.data === 'object' && e.data?.event === 'calendly.event_scheduled') {
-                closeCalendly();
-                addMessage('¡Reunión agendada! Te llegará un correo con la confirmación. Gracias por coordinar.', false);
-            }
-        });
+        // Calendly embebido removido: se abre el enlace directamente en otra pestaña
 
         // Reiniciar sesión de chat
         function resetSession() {
