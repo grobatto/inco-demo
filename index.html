@@ -224,6 +224,7 @@
         .message {
             margin-bottom: 1rem;
             display: flex;
+            align-items: flex-start;
         }
 
         .message-bot {
@@ -253,6 +254,71 @@
             border: 1px solid rgba(136, 136, 136, 0.3);
             border-bottom-right-radius: 4px;
         }
+
+        /* Avatares del chat */
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+        .avatar-bot { background: var(--gradient-primary); color: #fff; }
+        .avatar-user { background: rgba(136,136,136,0.25); color: #fff; }
+
+        /* Botón de agendar dentro del chat */
+        .schedule-btn {
+            background: var(--gradient-primary);
+            color: #ffffff;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .schedule-btn:focus { outline: 3px solid rgba(0,102,255,0.35); outline-offset: 2px; }
+        .schedule-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,102,255,0.35); }
+
+        /* Calendly embebido en el modal */
+        .calendly-container {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .calendly-panel {
+            background: var(--dark-card);
+            border: 1px solid var(--gray-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 720px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .calendly-header { display:flex; align-items:center; justify-content:space-between; padding:.75rem 1rem; border-bottom:1px solid var(--gray-border); }
+        .panel-title { font-weight: 600; }
+        .panel-close { background:none; border:1px solid var(--gray-border); color:var(--text-secondary); padding:.4rem .8rem; border-radius:999px; cursor:pointer; font-weight:600; }
+        .panel-close:focus { outline: 3px solid rgba(255,255,255,0.25); outline-offset: 2px; }
+        .calendly-body { flex:1; overflow:hidden; }
+
+        /* Animaciones on-scroll */
+        .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+        .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+        /* Accesibilidad: foco visible */
+        :focus-visible { outline: 3px solid rgba(0, 212, 255, 0.5); outline-offset: 2px; }
 
         .section {
             padding: 5rem 2rem;
@@ -856,10 +922,25 @@
                         <p style="font-size: 0.875rem; color: #22c55e; margin: 0;">En línea</p>
                     </div>
                 </div>
-                <button class="close-button" onclick="closeModal()">×</button>
+                <div style="display:flex;gap:.5rem;align-items:center;">
+                    <button class="panel-close" id="resetButton" aria-label="Reiniciar chat" onclick="resetSession()">Reiniciar</button>
+                    <button class="close-button" aria-label="Cerrar" onclick="closeModal()">×</button>
+                </div>
             </div>
-            <div id="messagesContainer" class="modal-messages">
+            <div id="messagesContainer" class="modal-messages reveal" role="log" aria-live="polite" aria-relevant="additions">
                 <!-- Messages will be injected here -->
+            </div>
+            <!-- Calendly overlay inside modal -->
+            <div id="calendlyContainer" class="calendly-container" aria-hidden="true">
+                <div class="calendly-panel" role="dialog" aria-modal="true" aria-labelledby="calendlyTitle">
+                    <div class="calendly-header">
+                        <span id="calendlyTitle" class="panel-title">Agendar una reunión</span>
+                        <button class="panel-close" onclick="closeCalendly()" aria-label="Volver al chat">Volver al chat</button>
+                    </div>
+                    <div class="calendly-body">
+                        <div id="calendlyInline" class="calendly-inline-widget" style="min-width:320px;height:100%;"></div>
+                    </div>
+                </div>
             </div>
             <div class="modal-input">
                 <input type="text" id="messageInput" placeholder="Escribe tu mensaje..." onkeypress="handleKeyPress(event)">
@@ -878,6 +959,9 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const messagesContainer = document.getElementById('messagesContainer');
+        const resetBtn = document.getElementById('resetButton');
+        const calendlyContainer = document.getElementById('calendlyContainer');
+        const calendlyInline = document.getElementById('calendlyInline');
         
         const API_URL = 'https://nwzz035rv2.execute-api.us-east-1.amazonaws.com/chat'; // <-- URL de tu API
         let isLoading = false;
@@ -910,13 +994,56 @@
         function addMessage(text, isUser) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'message-user' : 'message-bot'}`;
-            
+
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${isUser ? 'avatar-user' : 'avatar-bot'}`;
+            avatar.setAttribute('aria-hidden', 'true');
+            avatar.textContent = isUser ? 'Tú' : 'IA';
+
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
             bubble.textContent = text;
-            
-            messageDiv.appendChild(bubble);
+
+            if (isUser) {
+                messageDiv.appendChild(bubble);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(bubble);
+            }
+
             messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Renderiza un mensaje del bot con botón para agendar
+        function addScheduleMessage(url) {
+            const wrap = document.createElement('div');
+            wrap.className = 'message message-bot';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar avatar-bot';
+            avatar.textContent = 'IA';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
+            const text = document.createElement('div');
+            text.textContent = 'Para coordinar la próxima charla, podés reservar una reunión cuando te quede cómodo:';
+
+            const btn = document.createElement('button');
+            btn.className = 'schedule-btn';
+            btn.textContent = 'Agendar demo';
+            btn.onclick = () => openCalendly(url);
+            btn.setAttribute('aria-label', 'Abrir calendario para agendar demo');
+
+            bubble.appendChild(text);
+            bubble.appendChild(document.createElement('br'));
+            bubble.appendChild(btn);
+
+            wrap.appendChild(avatar);
+            wrap.appendChild(bubble);
+            messagesContainer.appendChild(wrap);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
@@ -975,7 +1102,18 @@
                 
                 const data = await response.json();
                 hideTypingIndicator();
-                addMessage(data.response || 'Lo siento, hubo un error al procesar tu mensaje.', false);
+
+                const botText = data.response || 'Lo siento, hubo un error al procesar tu mensaje.';
+                // Detectar enlace de Calendly en el texto para renderizar botón/embebido
+                const calendlyMatch = botText.match(/https?:\/\/calendly\.com\/[^\s)]+/i);
+                if (calendlyMatch) {
+                    // Añadir el texto sin el link como mensaje y luego el botón
+                    const textWithoutLink = botText.replace(calendlyMatch[0], '').trim();
+                    if (textWithoutLink) addMessage(textWithoutLink, false);
+                    addScheduleMessage(calendlyMatch[0]);
+                } else {
+                    addMessage(botText, false);
+                }
             } catch (error) {
                 hideTypingIndicator();
                 addMessage(`Lo siento, hubo un error de conexión. Detalle: ${error.message}`, false);
@@ -986,6 +1124,61 @@
             }
         }
 
+        // Abre Calendly dentro del modal
+        function openCalendly(url) {
+            calendlyInline.setAttribute('data-url', url);
+            calendlyContainer.style.display = 'flex';
+            calendlyContainer.setAttribute('aria-hidden', 'false');
+            if (window.Calendly && window.Calendly.initInlineWidgets) {
+                window.Calendly.initInlineWidgets();
+            }
+        }
+
+        function closeCalendly() {
+            calendlyContainer.style.display = 'none';
+            calendlyContainer.setAttribute('aria-hidden', 'true');
+        }
+
+        // Escuchar evento de Calendly cuando se agenda
+        window.addEventListener('message', function(e) {
+            if (typeof e.data === 'object' && e.data?.event === 'calendly.event_scheduled') {
+                closeCalendly();
+                addMessage('¡Reunión agendada! Te llegará un correo con la confirmación. Gracias por coordinar.', false);
+            }
+        });
+
+        // Reiniciar sesión de chat
+        function resetSession() {
+            try {
+                localStorage.removeItem('inco-agent-sessionId');
+                sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('inco-agent-sessionId', sessionId);
+                messagesContainer.innerHTML = '';
+                addMessage('¡Hola! Soy el asistente de INCO Soluciones. Es un gusto saludarte. ¿Cómo puedo ayudarte hoy?', false);
+                messageInput.focus();
+            } catch (e) {
+                console.error('Error al reiniciar la sesión:', e);
+            }
+        }
+
+        // Accesibilidad: cerrar con ESC
+        document.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape' && chatModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Animaciones on-scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('in-view');
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.section, .process-card, .benefit-card, .architecture-flow, .chat-preview, .modal-messages').forEach(el => {
+            el.classList.add('reveal');
+            observer.observe(el);
+        });
+
         // Click outside to close
         chatModal.addEventListener('click', function(e) {
             if (e.target === this) {
@@ -993,5 +1186,6 @@
             }
         });
     </script>
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 </body>
 </html>
