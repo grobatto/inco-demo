@@ -104,6 +104,7 @@
         <a href="#caracteristicas" style="text-decoration:none; color:inherit;">Características</a>
         <a href="#como-funciona" style="text-decoration:none; color:inherit;">Cómo funciona</a>
         <a href="#futuro" style="text-decoration:none; color:inherit;">Próximamente</a>
+        <a href="#arquitectura" style="text-decoration:none; color:inherit;">Arquitectura</a>
       </nav>
     </header>
 
@@ -164,6 +165,54 @@
         <div class="step"><span>Paso 2</span><h4>Recopila datos</h4><p>Pide nombre y email de a uno, validando sutilmente.</p></div>
         <div class="step"><span>Paso 3</span><h4>Cierre seguro</h4><p>Con datos completos, cierra y crea el lead en Monday.com.</p></div>
         <div class="step"><span>Paso 4</span><h4>Audita</h4><p>Consulta leads y conversaciones por `sessionId`.</p></div>
+      </div>
+    </section>
+
+    <section id="arquitectura" class="section">
+      <h2 style="margin:0 0 18px; font-size:28px;">Arquitectura</h2>
+      <div class="feat">
+        <div class="muted">Diagrama general</div>
+        <pre class="mermaid">graph TB
+    subgraph "Cliente Web"
+        A[Usuario] --> B[Frontend HTML/JS]
+        B --> C[localStorage SessionId]
+    end
+
+    subgraph "AWS Cloud"
+        D[API Gateway] --> E[Lambda Chat Function]
+        E --> F[Vertex AI Gemini 2.5 Flash]
+        E --> G[DynamoDB Leads Table]
+        E --> H[DynamoDB Conversations Table]
+        E --> I[Monday.com API]
+        E --> J[AWS Secrets Manager]
+        
+        K[Lambda GetLeads Function] --> G
+        L[Lambda GetConversations Function] --> H
+        
+        M[API Gateway /leads] --> K
+        N[API Gateway /conversations] --> L
+    end
+    
+    subgraph "Servicios Externos"
+        F --> O[Google Cloud Platform]
+        I --> P[Monday.com Platform]
+        J --> Q[Gemini API Key]
+        J --> R[Monday API Key]
+    end
+    
+    B -->|POST /chat| D
+    B -->|GET /leads| M
+    B -->|GET /conversations| N
+    
+    E -->|Fallback Local| S[Heurísticas Locales]
+    
+    style A fill:#e1f5fe
+    style B fill:#e8f5e8
+    style E fill:#fff3e0
+    style F fill:#f3e5f5
+    style G fill:#e0f2f1
+    style H fill:#e0f2f1
+    style I fill:#fce4ec</pre>
       </div>
     </section>
 
@@ -260,6 +309,8 @@
     // Mensaje inicial
     addRow('¡Hola! Soy el asistente de INCO Soluciones. ¿En qué puedo ayudarte hoy?', false);
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
 </body>
 </html>
 
